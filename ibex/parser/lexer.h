@@ -158,8 +158,24 @@ namespace ibex {
         explicit ExpressionLexer(std::string_view query, size_t max_query_size_ = 0)
             : ExpressionLexer(query.data(), query.data() + query.size(), max_query_size_) {
         }
+
+        /// 1-based index of the token most recently produced by next_token().
+        /// 0 before any token is produced. An error token counts as one token.
+        /// EndOfStream is counted once; further next_token() calls at the end do not
+        /// increment. The value at the end is the total token count, not an array subscript.
+        int token_index() const { return _token_index; }
+
+        /////////////////////////////////////////////////////////////////////
+        /// Pull interface. Each call lexes and returns the next token.
+        /// Does not read or write the look-ahead cache.
+        /// Not interchangeable with look_at / consume. Do not mix the two groups
+        /// on the same lexer: they share the scan cursor and will fall out of step.
         Token next_token();
 
+        /////////////////////////////////////////////////////////////////////
+        /// Look-ahead interface. look_at / consume / line / column share one cached
+        /// token. Not interchangeable with next_token(). Do not mix the two groups
+        /// on the same lexer: they share the scan cursor and will fall out of step.
         const Token& look_at();
 
         /// Token.view() == tok. End and error tokens do not match.
@@ -198,6 +214,9 @@ namespace ibex {
         /// This is needed to disambiguate tuple access operator from floating point number (.1).
         /// No previous token.
         TokenType prev_significant_token_type = TokenType::Whitespace;
+
+        int _token_index = 0;
+        bool _counted_end = false;
 
         /// Current token for look_at / consume. Empty means not pulled yet.
         /// next_token() does not read or write this.

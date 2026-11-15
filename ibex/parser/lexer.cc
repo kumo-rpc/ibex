@@ -282,6 +282,11 @@ namespace ibex {
         stamp(res);
         if (res.is_significant())
             prev_significant_token_type = res.type;
+        if (!(res.is_end() && _counted_end)) {
+            ++_token_index;
+            if (res.is_end())
+                _counted_end = true;
+        }
         return res;
     }
 

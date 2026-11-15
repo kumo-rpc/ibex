@@ -213,6 +213,49 @@ TEST(Lexer, ConsumeTypeAndWhitespace) {
     EXPECT_TRUE(open.look_at().is_end());
 }
 
+TEST(Lexer, TokenIndex) {
+    Lexer lexer("a b");
+    EXPECT_EQ(lexer.token_index(), 0);
+    EXPECT_EQ(lexer.next_token().view(), "a");
+    EXPECT_EQ(lexer.token_index(), 1);
+    EXPECT_EQ(lexer.next_token().type, TokenType::Whitespace);
+    EXPECT_EQ(lexer.token_index(), 2);
+    EXPECT_EQ(lexer.next_token().view(), "b");
+    EXPECT_EQ(lexer.token_index(), 3);
+    EXPECT_TRUE(lexer.next_token().is_end());
+    EXPECT_EQ(lexer.token_index(), 4);
+    EXPECT_TRUE(lexer.next_token().is_end());
+    EXPECT_EQ(lexer.token_index(), 4);
+
+    Lexer empty("");
+    EXPECT_EQ(empty.token_index(), 0);
+    EXPECT_TRUE(empty.next_token().is_end());
+    EXPECT_EQ(empty.token_index(), 1);
+    EXPECT_TRUE(empty.next_token().is_end());
+    EXPECT_EQ(empty.token_index(), 1);
+}
+
+TEST(Lexer, TokenIndexCountsError) {
+    Lexer unclosed("a /*");
+    EXPECT_EQ(unclosed.next_token().view(), "a");
+    EXPECT_EQ(unclosed.token_index(), 1);
+    EXPECT_EQ(unclosed.next_token().type, TokenType::Whitespace);
+    EXPECT_EQ(unclosed.token_index(), 2);
+    Token err = unclosed.next_token();
+    EXPECT_EQ(err.type, TokenType::ErrorMultilineCommentIsNotClosed);
+    EXPECT_EQ(unclosed.token_index(), 3);
+    EXPECT_TRUE(unclosed.next_token().is_end());
+    EXPECT_EQ(unclosed.token_index(), 4);
+    EXPECT_TRUE(unclosed.next_token().is_end());
+    EXPECT_EQ(unclosed.token_index(), 4);
+
+    Lexer quote("'abc");
+    EXPECT_EQ(quote.next_token().type, TokenType::ErrorSingleQuoteIsNotClosed);
+    EXPECT_EQ(quote.token_index(), 1);
+    EXPECT_TRUE(quote.next_token().is_end());
+    EXPECT_EQ(quote.token_index(), 2);
+}
+
 TEST(Lexer, Empty) {
     auto tokens = Tokenize("");
     ASSERT_EQ(tokens.size(), 1u);
