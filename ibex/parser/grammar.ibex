@@ -1,0 +1,22 @@
+// shot comment
+/// long comment
+/* multi lone comment
+   line 0
+   line 1
+*/
+
+edition = "x2026"
+
+import "ibex/schema.ibex"
+import.cxx  "cstd"
+import.java  "com.kumo.pub.algos"
+import.go  "github.com/kumo-rpc/go-ibex"
+
+
+package kumo.pub
+package.java  "com.kumo.pub.algos"
+package.go  "github.com/kumo-rpc/go-ibex"
+
+struct MyStruct {
+    optional int8 = 1;
+}

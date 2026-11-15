@@ -27,3 +27,17 @@ kmcmake_cc_interface(
         ${KMCMAKE_CXX_OPTIONS}
         PUBLIC
 )
+
+kmcmake_cc_library(
+        NAMESPACE
+            ${PROJECT_NAME}
+        NAME
+            ibex
+        SOURCES
+            parser/lexer.cc
+        CXXOPTS
+            ${KMCMAKE_CXX_OPTIONS}
+        LINKS
+            ${KMCMAKE_DEPS_LINK}
+        PUBLIC
+)

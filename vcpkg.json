@@ -1,0 +1,6 @@
+{
+  "dependencies": [
+    "turbo",
+    "gtest"
+  ]
+}
